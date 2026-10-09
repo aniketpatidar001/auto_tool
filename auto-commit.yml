@@ -1,0 +1,30 @@
+name: Daily Auto Commit
+
+on:
+  schedule:
+    # Runs every day at 09:00 UTC. Change the cron value if you want a different time.
+    - cron: '0 9 * * *'
+  workflow_dispatch: {}   # lets you trigger it manually from the Actions tab too
+
+permissions:
+  contents: write
+
+jobs:
+  auto-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Update log file
+        run: |
+          mkdir -p logs
+          echo "Commit made on $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> logs/activity.log
+
+      - name: Commit and push
+        run: |
+          git config user.name "chaturvediakshay74-prog"
+          git config user.email "chaturvediakshay74-prog@users.noreply.github.com"
+          git add logs/activity.log
+          git diff --cached --quiet || git commit -m "chore: daily auto commit $(date -u '+%Y-%m-%d')"
+          git push
